@@ -42,6 +42,16 @@ export class FoodService {
     return Food.create(dto);
   }
 
+  static async update(id: string, dto: Partial<CreateFoodDTO>): Promise<IFood> {
+    const food = await Food.findByIdAndUpdate(id, dto, { new: true, runValidators: true });
+    if (!food) {
+      const err: any = new Error('Food item not found');
+      err.statusCode = 404;
+      throw err;
+    }
+    return food;
+  }
+
   static async delete(id: string): Promise<void> {
     const deleted = await Food.findByIdAndDelete(id);
     if (!deleted) {
@@ -51,3 +61,4 @@ export class FoodService {
     }
   }
 }
+

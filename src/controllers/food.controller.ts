@@ -70,6 +70,35 @@ export class FoodController {
     }
   }
 
+  static async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { name, category, price, image, description } = req.body;
+      const updateData: any = {};
+      if (name !== undefined) updateData.name = name.trim();
+      if (category !== undefined) updateData.category = category.trim();
+      if (price !== undefined) {
+        const numPrice = Number(price);
+        if (isNaN(numPrice) || numPrice < 0) {
+          res.status(400).json({ success: false, message: 'Valid positive price is required' });
+          return;
+        }
+        updateData.price = numPrice;
+      }
+      if (image !== undefined) updateData.image = image.trim();
+      if (description !== undefined) updateData.description = description.trim();
+
+      const food = await FoodService.update(id, updateData);
+      res.status(200).json({
+        success: true,
+        message: 'Food item updated successfully',
+        data: { food },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
